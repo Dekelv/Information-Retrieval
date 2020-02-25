@@ -23,7 +23,7 @@ https://github.com/beefoo/text-analysis
 #### Lexical
 4. bags-of-words
 5. token unigrams, bigrams and character trigrams and fourgrams.
-6. numeric and binary features containing info about character
+6. character flooding
 7. punctuation flooding
 8. punctuation
 9. capitalisation
