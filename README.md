@@ -6,6 +6,12 @@ https://drive.google.com/drive/folders/1pv98lYVuW26LHKoIVs8v_n7SVW7Kut-e
 # Original Paper Dataset 
 https://github.com/Cyvhee/SemEval2018-Task3/tree/master/datasets
 
+# Lexicons
+## AFINN
+https://pypi.org/project/afinn/
+## GI, MPQA, NRC, LIU
+https://github.com/beefoo/text-analysis
+
 
 ## TODO
 ### Preprocessing
