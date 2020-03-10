@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[69]:
 
 
 import pandas as pd
@@ -16,8 +16,11 @@ from nltk.tokenize.casual import casual_tokenize
 from nltk.stem import WordNetLemmatizer
 
 
-# In[ ]:
+# In[70]:
 
+
+def division_nonzero(n, d):
+    return n / d if d else 0
 
 ## Get array of all lexical features
 # If you want numeric flooding or punctuation features, make sure to set these parameters to True when calling the method
@@ -61,12 +64,9 @@ def get_lexical_features(corpus, use_spaces=True, flooding_numeric=False, punctu
     # Count co-occurences in lists
     count = lambda l1, l2: len(list(filter(lambda c: c in l2, l1)))
     
-    # For every text in the corpus
-    for tweet in corpus:
-        
-        # Save the length in tokens
-        tweet_length.append(len(tweet))
-        
+    
+    # Create all the n-grams
+    for tweet in tqdm_notebook(corpus):
         # Create sentences, with and without spaces
         sentence = " ".join(tweet)
         sentence_nospace = "".join(tweet)
@@ -81,6 +81,31 @@ def get_lexical_features(corpus, use_spaces=True, flooding_numeric=False, punctu
         else:
             char_trigrams.append(list(ngrams(sentence_nospace, 3)))
             char_fourgrams.append(list(ngrams(sentence_nospace, 4)))
+            
+    
+    # Create all the bags of n-grams
+    bag_of_unigrams = bag_of_words(token_unigrams, bow_length)
+    bag_of_bigrams = bag_of_words(token_bigrams, bow_length)
+    bag_of_trigrams = bag_of_words(char_trigrams, bow_length)
+    bag_of_fourgrams = bag_of_words(char_fourgrams, bow_length)
+    
+    counter = 0
+    
+    # For every text in the corpus
+    for tweet in tqdm_notebook(corpus):
+        feature = []
+        
+        # Add bag of word entries for tweet
+        feature = [*feature, *bag_of_unigrams[counter]]
+        feature = [*feature, *bag_of_bigrams[counter]]
+        feature = [*feature, *bag_of_trigrams[counter]]
+        feature = [*feature, *bag_of_fourgrams[counter]]
+        # Save the length in tokens
+        tweet_length.append(len(tweet))
+        
+        # Create sentences, with and without spaces
+        sentence = " ".join(tweet)
+        sentence_nospace = "".join(tweet)
 
         # Count punctuation and capitalisation
         amount_punct = count(sentence, string.punctuation)
@@ -112,6 +137,7 @@ def get_lexical_features(corpus, use_spaces=True, flooding_numeric=False, punctu
         
         # For every token
         for word in tweet:
+            
             # Detect hashtags
             if word.startswith("#"):
                 amount_hashtags += 1
@@ -142,21 +168,48 @@ def get_lexical_features(corpus, use_spaces=True, flooding_numeric=False, punctu
         
         # Calculate emoticon frequency ((amount of emoticons / tweet length in tokens) * 100)
         emoticon_freq.append((amount_emoticons / len(tweet)) * 100)
+
+
+        # Add other features to the feature set
+        feature += punctuation
+        feature += capitalisation
+        feature += flooding
+        feature += hashtag_freq
+        feature += hashtag_to_word
+        feature += emoticon_freq
+        feature += tweet_length
         
-    # Add bags of n-grams to the feature set
-    features.append(bag_of_words(token_unigrams, bow_length))
-    features.append(bag_of_words(token_bigrams, bow_length))
-    features.append(bag_of_words(char_trigrams_nosp, bow_length))
-    features.append(bag_of_words(char_fourgrams_nosp, bow_length))
-    
-    # Add other features to the feature set
-    features.append(punctuation)
-    features.append(capitalisation)
-    features.append(flooding)
-    features.append(hashtag_freq)
-    features.append(hashtag_to_word)
-    features.append(emoticon_freq)
-    features.append(tweet_length)
+        counter += 1
+        
+        features.append(feature)
 
     return features
+
+def bag_of_words(array, bow_length=None):
+    # Map for word frequencies
+    word2count = {} 
+
+    # For every tweet, update word count for each word
+    for tweet in array: 
+        for word in tweet: 
+            if word not in word2count.keys(): 
+                word2count[word] = 1
+            else: 
+                word2count[word] += 1
+
+    if bow_length is None:
+        bow_length = len(word2count)
+    freq_words = heapq.nlargest(bow_length, word2count, key=word2count.get)
+
+    # Array for bags of words
+    X = [] 
+    for tweet in array: 
+        vector = [] 
+        for word in freq_words: 
+            if word in tweet: 
+                vector.append(1) 
+            else: 
+                vector.append(0) 
+        X.append(vector) 
+    return np.asarray(X)
 
