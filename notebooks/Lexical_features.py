@@ -22,7 +22,7 @@ from nltk.stem import WordNetLemmatizer
 ## Get array of all lexical features
 # If you want numeric flooding or punctuation features, make sure to set these parameters to True when calling the method
 # bow_length is the length of your bag_of_words features.
-def get_lexical_features(corpus, flooding_numeric=False, punctuation_numeric=False, bow_length=None):
+def get_lexical_features(corpus, use_spaces=True, flooding_numeric=False, punctuation_numeric=False, bow_length=None):
     features = []
     
     # Token unigrams
@@ -31,13 +31,11 @@ def get_lexical_features(corpus, flooding_numeric=False, punctuation_numeric=Fal
     # Token bigrams
     token_bigrams = []
     
-    # Character trigrams (with spaces)
+    # Character trigrams
     char_trigrams = []
     
-    # Character fourgrams (with spaces)
-    char_fourgrams = []
-#     char_trigrams_nosp = []
-#     char_fourgrams_nosp = []        
+    # Character fourgrams
+    char_fourgrams = []    
     
     # Punctuation (numerical/binary)
     punctuation = []
@@ -76,13 +74,13 @@ def get_lexical_features(corpus, flooding_numeric=False, punctuation_numeric=Fal
         # Token bigrams
         token_bigrams.append(list(ngrams(tweet, 2)))
         
-        # Character trigrams
-        char_trigrams.append(list(ngrams(sentence, 3)))
-        
-        # Character fourgrams
-        char_fourgrams.append(list(ngrams(sentence, 4)))
-#         char_trigrams_nosp.append(list(ngrams(sentence_nospace, 3)))
-#         char_fourgrams_nosp.append(list(ngrams(sentence_nospace, 4)))
+        # Character trigrams and fourgrams
+        if use_spaces is True:
+            char_trigrams.append(list(ngrams(sentence, 3)))
+            char_fourgrams.append(list(ngrams(sentence, 4)))
+        else:
+            char_trigrams.append(list(ngrams(sentence_nospace, 3)))
+            char_fourgrams.append(list(ngrams(sentence_nospace, 4)))
 
         # Count punctuation and capitalisation
         amount_punct = count(sentence, string.punctuation)
