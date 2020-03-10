@@ -11,16 +11,11 @@ from gensim.models import Word2Vec
 import numpy as np
 import pathlib
 
-scores = {} # scores is an empty dict alreadydef __init__(self):
 features_size=200
 path = pathlib.Path(__file__).parent.absolute()
 target = str(path) + '/word2vec/knnModel.sav'
 means = pickle.load(open(target,'rb'))
     
-
-
-# In[2]:
-
 
 from gensim.test.utils import common_texts, get_tmpfile
 from gensim.models import Word2Vec
@@ -51,21 +46,12 @@ def get_tweet_features(sentence):
     return features
 
 
-# In[4]:
-
-
-get_features(['hello','hi'])
-
-
-# In[ ]:
-
-
 import nltk
 from nltk import word_tokenize
 nltk.download('punkt')
 
 ##get_features takes a array of tokens(sentence) and returns a feature vector 
-def get_features(corpus):
+def get_semantic_features(corpus):
     total_features = []
     for tweet in corpus:
         total_features.append(get_tweet_features(word_tokenize(tweet)))
