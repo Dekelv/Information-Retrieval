@@ -1,2 +1,5 @@
 data/
 notebooks/.ipynb_checkpoints/
+
+!notebooks/data/training.txt
+!notebooks/data/test.txt
