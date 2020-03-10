@@ -42,9 +42,8 @@ for i in range(len(wordvectors.vocab)):
 # In[3]:
 
 
-
 ##get_features takes a array of tokens(sentence) and returns a feature vector 
-def get_features(sentence):
+def get_tweet_features(sentence):
     features = np.zeros(features_size)
     for word in sentence:
         feature = means.predict(vectors[words[word]].reshape(1, 200))
@@ -61,5 +60,15 @@ get_features(['hello','hi'])
 # In[ ]:
 
 
+import nltk
+from nltk import word_tokenize
+nltk.download('punkt')
+
+##get_features takes a array of tokens(sentence) and returns a feature vector 
+def get_features(corpus):
+    total_features = []
+    for tweet in corpus:
+        total_features.append(get_tweet_features(word_tokenize(tweet)))
+    return features
 
 
