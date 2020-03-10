@@ -41,10 +41,10 @@ for i in range(len(wordvectors.vocab)):
 def get_tweet_features(sentence):
     features = np.zeros(features_size)
     for word in sentence:
-        feature = means.predict(vectors[words[word]].reshape(1, 200))
-        features[feature]=1
+        if(word in words):    
+            feature = means.predict(vectors[words[word]].reshape(1, 200))
+            features[feature]=1
     return features
-
 
 import nltk
 from nltk import word_tokenize
