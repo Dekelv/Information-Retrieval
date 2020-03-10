@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[88]:
+# In[4]:
 
 
 import pandas as pd
@@ -16,7 +16,7 @@ from nltk.tokenize.casual import casual_tokenize
 from nltk.stem import WordNetLemmatizer
 
 
-# In[89]:
+# In[37]:
 
 
 def division_nonzero(n, d):
@@ -40,27 +40,7 @@ def get_lexical_features(corpus, use_spaces=True, flooding_numeric=False, punctu
     # Character fourgrams
     char_fourgrams = []    
     
-    # Punctuation (numerical/binary)
-    punctuation = []
-    
-    # Capitalisation (numerical/binary)
-    capitalisation = []
-    
-    # Flooding (numerical/binary)
-    character_flooding = []
-    punctuation_flooding = []
-    
-    # Hashtag frequency
-    hashtag_freq = []
-    
-    # Hashtag-to-word ratio
-    hashtag_to_word = []
-    
-    # Emoticon frequency
-    emoticon_freq = []
-    
-    # Tweet length (in tokens)
-    tweet_length = []
+
     
     # Count co-occurences in lists
     count = lambda l1, l2: len(list(filter(lambda c: c in l2, l1)))
@@ -94,6 +74,28 @@ def get_lexical_features(corpus, use_spaces=True, flooding_numeric=False, punctu
     
     # For every text in the corpus
     for tweet in tqdm_notebook(corpus):
+        
+                # Punctuation (numerical/binary)
+        punctuation = []
+
+        # Capitalisation (numerical/binary)
+        capitalisation = []
+
+        # Flooding (numerical/binary)
+        character_flooding = []
+        punctuation_flooding = []
+
+        # Hashtag frequency
+        hashtag_freq = []
+
+        # Hashtag-to-word ratio
+        hashtag_to_word = []
+
+        # Emoticon frequency
+        emoticon_freq = []
+
+        # Tweet length (in tokens)
+        tweet_length = []
         feature = []
         
         # Add bag of word entries for tweet
@@ -101,6 +103,7 @@ def get_lexical_features(corpus, use_spaces=True, flooding_numeric=False, punctu
         feature = [*feature, *bag_of_bigrams[counter]]
         feature = [*feature, *bag_of_trigrams[counter]]
         feature = [*feature, *bag_of_fourgrams[counter]]
+
         # Save the length in tokens
         tweet_length.append(len(tweet))
         
