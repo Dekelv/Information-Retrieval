@@ -3,7 +3,7 @@
 
 # ### Preprocessing
 
-# In[129]:
+# In[1]:
 
 
 import re
@@ -16,7 +16,7 @@ from IPython.display import display
 from tqdm import tqdm_notebook
 
 
-# In[5]:
+# In[2]:
 
 
 # uncomment the following to download required libs
@@ -27,20 +27,20 @@ nltk.download('words')
 nltk.download('tagsets')
 
 
-# In[6]:
+# In[3]:
 
 
 df = pd.read_csv('data/original.txt', sep='\t', quotechar='~')
 
 
-# In[7]:
+# In[4]:
 
 
 tweet_labels = np.array(df['Label'])
 tweets = np.array(df['Tweet text'])
 
 
-# In[8]:
+# In[5]:
 
 
 lemmatizer = WordNetLemmatizer() 
@@ -50,7 +50,7 @@ tweets_lemmatized = [[lemmatizer.lemmatize(token) for token in tweet] for tweet 
 
 # ### Name Entity Recognition (using SpaCy)
 
-# In[18]:
+# In[6]:
 
 
 import spacy
@@ -61,61 +61,54 @@ import en_core_web_sm
 nlp = en_core_web_sm.load()
 
 
-# In[19]:
+# In[7]:
 
 
 # only need to apply nlp once
 # the entire background pipeline will return the objects
-example = 'European authorities fined Google a record $5.1 billion on Wednesday for abusing its power in the mobile phone market and ordered the company to alter its practices'
-doc = nlp(example)
-pprint([(X.text, X.label_) for X in doc.ents])
+# example = 'European authorities fined Google a record $5.1 billion on Wednesday for abusing its power in the mobile phone market and ordered the company to alter its practices'
+# doc = nlp(example)
+# pprint([(X.text, X.label_) for X in doc.ents])
 
 
-# In[21]:
-
-
-# get number of extracted entities
-print(f'number of entities: {len(doc.ents)}')
-
-
-# In[22]:
+# In[8]:
 
 
 # get entity labels and number
-labels = [x.label_ for x in doc.ents]
-Counter(labels)
+# labels = [x.label_ for x in doc.ents]
+# Counter(labels)
 
 
-# In[23]:
+# In[9]:
 
 
 # displacy.render(nlp(example), jupyter=True, style='ent')
 
 
-# In[24]:
+# In[10]:
 
 
 # displacy.render(nlp(example), style='dep', jupyter = True, options = {'distance': 120})
 
 
-# In[25]:
+# In[11]:
 
 
 # we verbatim extract part-of-speech and lemmatize this sentence
-[(x.orth_,x.pos_, x.lemma_) for x in [y for y in nlp(str(example)) if not y.is_stop and y.pos_ != 'PUNCT']]
+# [(x.orth_,x.pos_, x.lemma_) for x in [y for y in nlp(str(example)) if not y.is_stop and y.pos_ != 'PUNCT']]
 
 
 # ### Sentiment Features
 
 # #### Affin scores
 
-# In[34]:
+# In[12]:
 
 
 df_affin = pd.read_csv('lexicons/afinn.txt', sep='\t')
 
 
-# In[35]:
+# In[13]:
 
 
 affin_map = dict()
@@ -129,7 +122,7 @@ affin_min = min(affin_scores)
 affin_max = max(affin_scores)
 
 
-# In[36]:
+# In[14]:
 
 
 # get the normalized affin score (range [-1, 1])
@@ -143,19 +136,19 @@ def get_affin_score(word):
 
 # #### General Inquirer scores
 
-# In[38]:
+# In[15]:
 
 
-raw_data = pd.read_excel ('lexicons/inquirerbasic.xls')
-raw_data = raw_data.as_matrix()
+raw_data = pd.read_excel('lexicons/inquirerbasic.xls')
 
 
-# In[39]:
+# In[16]:
 
 
 gi_map = dict()
 gi_scores = list()
-for row in raw_data:
+for i in range(len(raw_data)):
+    row = raw_data.iloc[i]
     word = row[0]
     positive = row[2]
     negative = row[3]
@@ -169,7 +162,7 @@ for row in raw_data:
         gi_scores.append(score)
 
 
-# In[40]:
+# In[17]:
 
 
 def get_gi_score(word):
@@ -181,13 +174,13 @@ def get_gi_score(word):
 
 # #### MPQA scores
 
-# In[42]:
+# In[18]:
 
 
 df_mpqa = pd.read_csv('lexicons/MPQA.txt')
 
 
-# In[43]:
+# In[19]:
 
 
 mpqa_map = dict()
@@ -205,7 +198,7 @@ for index, row in df_mpqa.iterrows():
     mpqa_scores.append(score)
 
 
-# In[44]:
+# In[20]:
 
 
 def get_mpqa_score(word):
@@ -217,14 +210,14 @@ def get_mpqa_score(word):
 
 # #### Liu’s scores
 
-# In[31]:
+# In[21]:
 
 
 df_liu_pos = pd.read_csv('lexicons/liu-positive-words.txt')
 df_liu_neg = pd.read_csv('lexicons/liu-negative-words.txt')
 
 
-# In[46]:
+# In[22]:
 
 
 liu_map = dict()
@@ -237,7 +230,7 @@ for index, row in df_liu_neg.iterrows():
     liu_scores.append(1)
 
 
-# In[47]:
+# In[23]:
 
 
 def get_liu_score(word):
@@ -249,13 +242,13 @@ def get_liu_score(word):
 
 # #### NRC Emotion Lexicon
 
-# In[32]:
+# In[24]:
 
 
 df_nrc = pd.read_csv('lexicons/NRC.txt', sep='\t')
 
 
-# In[49]:
+# In[25]:
 
 
 nrc_map = dict()
@@ -286,7 +279,7 @@ for index, row in df_nrc.iterrows():
     item += 1
 
 
-# In[50]:
+# In[26]:
 
 
 def get_nrc_score(word):
@@ -298,7 +291,7 @@ def get_nrc_score(word):
 
 # #### Feature Extraction
 
-# In[127]:
+# In[27]:
 
 
 def get_features(document, lexicon):
@@ -340,12 +333,13 @@ def get_features(document, lexicon):
     return features
 
 
-# In[133]:
+# In[28]:
 
 
 def get_sentiment_features(corpus):
+    tokens = [casual_tokenize(item) for item in corpus]
     features = list()
-    for item in tqdm_notebook(corpus):
+    for item in tqdm_notebook(tokens):
         feature = list()
         feature += get_features(item, 'affin')
         feature += get_features(item, 'gi')
