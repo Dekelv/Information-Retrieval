@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[69]:
+# In[88]:
 
 
 import pandas as pd
@@ -16,7 +16,7 @@ from nltk.tokenize.casual import casual_tokenize
 from nltk.stem import WordNetLemmatizer
 
 
-# In[70]:
+# In[89]:
 
 
 def division_nonzero(n, d):
@@ -47,7 +47,8 @@ def get_lexical_features(corpus, use_spaces=True, flooding_numeric=False, punctu
     capitalisation = []
     
     # Flooding (numerical/binary)
-    flooding = []
+    character_flooding = []
+    punctuation_flooding = []
     
     # Hashtag frequency
     hashtag_freq = []
@@ -131,7 +132,8 @@ def get_lexical_features(corpus, use_spaces=True, flooding_numeric=False, punctu
         
         
         # Counters for flooding, hashtags and emoticons
-        amount_flooding = 0
+        amount_char_flooding = 0
+        amount_punct_flooding = 0
         amount_hashtags = 0
         amount_emoticons = 0
         
@@ -146,19 +148,33 @@ def get_lexical_features(corpus, use_spaces=True, flooding_numeric=False, punctu
             if word.startswith(":") and word.endswith(":"):
                 amount_emoticons += 1
                 
-            # Check for flooding (3 of same characters in a row)
+            # Check for character flooding (3 of same characters in a row)
             for i in range(len(word)-2):
-                if word[i] == word[i + 1] and word[i + 1] == word[i + 2]:
-                    amount_flooding += 1
+                if word[i] == word[i + 1] and word[i + 1] == word[i + 2] and word[i] not in string.punctuation:
+                    amount_char_flooding += 1
+            
+        # Check for punctuation flooding (2 of same punctuation in a row)        
+        for i in range(len(sentence_nospace)-1):
+            if sentence_nospace[i] == sentence_nospace[i + 1] and sentence_nospace[i] in string.punctuation:
+                amount_punct_flooding += 1
         
         # If numeric, save amount of flooding characters, else binary
-        if amount_flooding > 0:
+        if amount_char_flooding > 0:
             if flooding_numeric is True:
-                flooding.append(amount_flooding)
+                character_flooding.append(amount_char_flooding)
             else:
-                flooding.append(1)
+                character_flooding.append(1)
         else:
-            flooding.append(0)
+            character_flooding.append(0)
+            
+        # If numeric, save amount of flooding punctuation, else binary
+        if amount_punct_flooding > 0:
+            if flooding_numeric is True:
+                punctuation_flooding.append(amount_punct_flooding)
+            else:
+                punctuation_flooding.append(1)
+        else:
+            punctuation_flooding.append(0)
             
         # Calculate hashtag frequency ((amount of hashtags / tweet length in tokens) * 100)
         hashtag_freq.append((amount_hashtags / len(tweet)) * 100)
@@ -173,7 +189,8 @@ def get_lexical_features(corpus, use_spaces=True, flooding_numeric=False, punctu
         # Add other features to the feature set
         feature += punctuation
         feature += capitalisation
-        feature += flooding
+        feature += character_flooding
+        feature += punctuation_flooding
         feature += hashtag_freq
         feature += hashtag_to_word
         feature += emoticon_freq
