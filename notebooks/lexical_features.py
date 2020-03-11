@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[9]:
+# In[1]:
 
 
 import pandas as pd
@@ -16,24 +16,43 @@ from nltk.tokenize.casual import casual_tokenize
 from nltk.stem import WordNetLemmatizer
 
 
-# In[28]:
+# In[9]:
 
 
-corpus = [["What", "is", "this", "shit"], ["Fuckkk", "my", "life", "!", "!", "!", "!", "?"]]
+corpus = ["What is this shit", "Fuckkk my life!!!?"]
+corpus2 = ["What2 s2 this shit", "Fuckkk2 my2 life!!", "lel"]
+corpus = preprocess(corpus)
+corpus2 = preprocess(corpus2)
 freq_list = get_frequencies(corpus)
 result = get_lexical_features(corpus, freq_list)
+result2 = get_lexical_features(corpus2, freq_list)
 
 
-# In[29]:
+# In[10]:
+
+
+print(result[0])
+print(result2[2])
+
+
+# In[8]:
 
 
 def division_nonzero(n, d):
     return n / d if d else 0
 
+def preprocess(corpus):
+    lemmatizer = WordNetLemmatizer() 
+    corpus = [casual_tokenize(tweet) for tweet in corpus]
+    corpus = [[lemmatizer.lemmatize(token) for token in tweet] for tweet in corpus]
+    return corpus
+
 ## Get array of all lexical features
 # If you want numeric flooding or punctuation features, make sure to set these parameters to True when calling the method
 # bow_length is the length of your bag_of_words features.
 def get_lexical_features(corpus, freq_list, use_spaces=True, flooding_numeric=False, punctuation_numeric=False, bow_length=None):
+    
+    
     features = []
     
     # Token unigrams
