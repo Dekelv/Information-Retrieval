@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[4]:
+# In[9]:
 
 
 import pandas as pd
@@ -16,7 +16,15 @@ from nltk.tokenize.casual import casual_tokenize
 from nltk.stem import WordNetLemmatizer
 
 
-# In[37]:
+# In[28]:
+
+
+corpus = [["What", "is", "this", "shit"], ["Fuckkk", "my", "life", "!", "!", "!", "!", "?"]]
+freq_list = get_frequencies(corpus)
+result = get_lexical_features(corpus, freq_list)
+
+
+# In[29]:
 
 
 def division_nonzero(n, d):
@@ -25,7 +33,7 @@ def division_nonzero(n, d):
 ## Get array of all lexical features
 # If you want numeric flooding or punctuation features, make sure to set these parameters to True when calling the method
 # bow_length is the length of your bag_of_words features.
-def get_lexical_features(corpus, use_spaces=True, flooding_numeric=False, punctuation_numeric=False, bow_length=None):
+def get_lexical_features(corpus, freq_list, use_spaces=True, flooding_numeric=False, punctuation_numeric=False, bow_length=None):
     features = []
     
     # Token unigrams
@@ -65,10 +73,10 @@ def get_lexical_features(corpus, use_spaces=True, flooding_numeric=False, punctu
             
     
     # Create all the bags of n-grams
-    bag_of_unigrams = bag_of_words(token_unigrams, bow_length)
-    bag_of_bigrams = bag_of_words(token_bigrams, bow_length)
-    bag_of_trigrams = bag_of_words(char_trigrams, bow_length)
-    bag_of_fourgrams = bag_of_words(char_fourgrams, bow_length)
+    bag_of_unigrams = bag_of_words(token_unigrams, freq_list)
+    bag_of_bigrams = bag_of_words(token_bigrams, freq_list)
+    bag_of_trigrams = bag_of_words(char_trigrams, freq_list)
+    bag_of_fourgrams = bag_of_words(char_fourgrams, freq_list)
     
     counter = 0
     
@@ -205,7 +213,7 @@ def get_lexical_features(corpus, use_spaces=True, flooding_numeric=False, punctu
 
     return features
 
-def bag_of_words(array, bow_length=None):
+def get_frequencies(array, bow_length=None):
     # Map for word frequencies
     word2count = {} 
 
@@ -220,7 +228,10 @@ def bag_of_words(array, bow_length=None):
     if bow_length is None:
         bow_length = len(word2count)
     freq_words = heapq.nlargest(bow_length, word2count, key=word2count.get)
+    
+    return freq_words
 
+def bag_of_words(array, freq_words):
     # Array for bags of words
     X = [] 
     for tweet in array: 
