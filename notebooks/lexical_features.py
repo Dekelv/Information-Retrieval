@@ -16,25 +16,6 @@ from nltk.tokenize.casual import casual_tokenize
 from nltk.stem import WordNetLemmatizer
 
 
-# In[9]:
-
-
-corpus = ["What is this shit", "Fuckkk my life!!!?"]
-corpus2 = ["What2 s2 this shit", "Fuckkk2 my2 life!!", "lel"]
-corpus = preprocess(corpus)
-corpus2 = preprocess(corpus2)
-freq_list = get_frequencies(corpus)
-result = get_lexical_features(corpus, freq_list)
-result2 = get_lexical_features(corpus2, freq_list)
-
-
-# In[10]:
-
-
-print(result[0])
-print(result2[2])
-
-
 # In[8]:
 
 
