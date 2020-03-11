@@ -55,6 +55,6 @@ def get_semantic_features(corpus):
     total_features = []
     for tweet in corpus:
         total_features.append(get_tweet_features(word_tokenize(tweet)))
-    return features
+    return total_features
 
 
