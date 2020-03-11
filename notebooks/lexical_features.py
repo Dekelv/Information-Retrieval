@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[34]:
 
 
 import pandas as pd
@@ -16,7 +16,7 @@ from nltk.tokenize.casual import casual_tokenize
 from nltk.stem import WordNetLemmatizer
 
 
-# In[8]:
+# In[35]:
 
 
 def division_nonzero(n, d):
@@ -73,10 +73,10 @@ def get_lexical_features(corpus, freq_list, use_spaces=True, flooding_numeric=Fa
             
     
     # Create all the bags of n-grams
-    bag_of_unigrams = bag_of_words(token_unigrams, freq_list)
-    bag_of_bigrams = bag_of_words(token_bigrams, freq_list)
-    bag_of_trigrams = bag_of_words(char_trigrams, freq_list)
-    bag_of_fourgrams = bag_of_words(char_fourgrams, freq_list)
+    bag_of_unigrams = bag_of_words(token_unigrams, freq_list[0])
+    bag_of_bigrams = bag_of_words(token_bigrams, freq_list[1])
+    bag_of_trigrams = bag_of_words(char_trigrams, freq_list[2])
+    bag_of_fourgrams = bag_of_words(char_fourgrams, freq_list[3])
     
     counter = 0
     
@@ -111,6 +111,7 @@ def get_lexical_features(corpus, freq_list, use_spaces=True, flooding_numeric=Fa
         feature = [*feature, *bag_of_bigrams[counter]]
         feature = [*feature, *bag_of_trigrams[counter]]
         feature = [*feature, *bag_of_fourgrams[counter]]
+
 
         # Save the length in tokens
         tweet_length.append(len(tweet))
@@ -214,22 +215,50 @@ def get_lexical_features(corpus, freq_list, use_spaces=True, flooding_numeric=Fa
     return features
 
 def get_frequencies(array, bow_length=None):
+    
     # Map for word frequencies
     word2count = {} 
-
+    bigram2count = {}
+    trigram2count = {}
+    fourgram2count = {}
+    
     # For every tweet, update word count for each word
     for tweet in array: 
+        sentence = " ".join(tweet)
+        
         for word in tweet: 
             if word not in word2count.keys(): 
                 word2count[word] = 1
             else: 
                 word2count[word] += 1
+        
+        for word in list(ngrams(tweet, 2)):
+            if word not in bigram2count.keys():
+                bigram2count[word] = 1
+            else:
+                bigram2count[word] += 1
+            
+        for chunk in list(ngrams(sentence, 3)):
+            if chunk not in trigram2count.keys():
+                trigram2count[chunk] = 1
+            else:
+                trigram2count[chunk] += 1
+        
+        for chunk in list(ngrams(sentence, 4)):
+            if chunk not in fourgram2count.keys():
+                fourgram2count[chunk] = 1
+            else:
+                fourgram2count[chunk] += 1
 
     if bow_length is None:
         bow_length = len(word2count)
-    freq_words = heapq.nlargest(bow_length, word2count, key=word2count.get)
+        
+    freq_words1 = heapq.nlargest(bow_length, word2count, key=word2count.get)
+    freq_words2 = heapq.nlargest(bow_length, bigram2count, key=bigram2count.get)
+    freq_words3 = heapq.nlargest(bow_length, trigram2count, key=trigram2count.get)
+    freq_words4 = heapq.nlargest(bow_length, fourgram2count, key=fourgram2count.get)
     
-    return freq_words
+    return [freq_words1, freq_words2, freq_words3, freq_words4]
 
 def bag_of_words(array, freq_words):
     # Array for bags of words
